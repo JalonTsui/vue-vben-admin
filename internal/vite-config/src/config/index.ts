@@ -20,7 +20,6 @@ function defineConfig(
     const htmlPath = join(process.cwd(), 'index.html');
     projectType = existsSync(htmlPath) ? 'application' : 'library';
   }
-
   switch (projectType) {
     case 'application': {
       return defineApplicationConfig(userConfigPromise);

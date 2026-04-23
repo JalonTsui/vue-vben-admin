@@ -18,28 +18,28 @@ import { router } from './router';
 import { setDefaultDrawerProps, setDefaultModalProps } from '@vben/common-ui';
 
 async function bootstrap(namespace: string) {
-  // 初始化组件适配器
-  await initComponentAdapter();
+  // 初始化组件适配器 全局注册组件
+  // await initComponentAdapter();
 
   // 初始化表单组件
-  await initSetupVbenForm();
+  // await initSetupVbenForm();
 
   // 设置弹窗的默认配置
-  setDefaultModalProps({
-    fullscreenButton: false,
-  });
+  // setDefaultModalProps({
+  //   fullscreenButton: false,
+  // });
   // 设置抽屉的默认配置
-  setDefaultDrawerProps({
-    zIndex: 1020,
-  });
+  // setDefaultDrawerProps({
+  //   zIndex: 1020,
+  // });
 
   const app = createApp(App);
 
   // 注册v-loading指令
-  registerLoadingDirective(app, {
-    loading: 'loading', // 在这里可以自定义指令名称，也可以明确提供false表示不注册这个指令
-    spinning: 'spinning',
-  });
+  // registerLoadingDirective(app, {
+  //   loading: 'loading', // 在这里可以自定义指令名称，也可以明确提供false表示不注册这个指令
+  //   spinning: 'spinning',
+  // });
 
   // 国际化 i18n 配置
   await setupI18n(app);

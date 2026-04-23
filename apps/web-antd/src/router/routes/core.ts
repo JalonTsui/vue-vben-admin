@@ -19,6 +19,11 @@ const coreRoutes: RouteRecordRaw[] = [
     component: ()=> import('#/views/Main.vue'),
     path:'/',
     name: 'main'
+  },
+  {
+    component: ()=> import('#/views/login/Login.vue'),
+    path: '/auth/login',
+    name: 'login'
   }
 ];
 

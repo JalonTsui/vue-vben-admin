@@ -15,6 +15,7 @@ import { initComponentAdapter } from './adapter/component';
 import { initSetupVbenForm } from './adapter/form';
 import App from './app.vue';
 import { router } from './router';
+import { setDefaultDrawerProps, setDefaultModalProps } from '@vben/common-ui';
 
 async function bootstrap(namespace: string) {
   // 初始化组件适配器
@@ -23,14 +24,14 @@ async function bootstrap(namespace: string) {
   // 初始化表单组件
   await initSetupVbenForm();
 
-  // // 设置弹窗的默认配置
-  // setDefaultModalProps({
-  //   fullscreenButton: false,
-  // });
-  // // 设置抽屉的默认配置
-  // setDefaultDrawerProps({
-  //   zIndex: 1020,
-  // });
+  // 设置弹窗的默认配置
+  setDefaultModalProps({
+    fullscreenButton: false,
+  });
+  // 设置抽屉的默认配置
+  setDefaultDrawerProps({
+    zIndex: 1020,
+  });
 
   const app = createApp(App);
 

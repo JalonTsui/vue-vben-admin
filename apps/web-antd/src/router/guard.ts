@@ -46,6 +46,7 @@ function setupCommonGuard(router: Router) {
  */
 function setupAccessGuard(router: Router) {
   router.beforeEach(async (to, from) => {
+    debugger;
     const accessStore = useAccessStore();
     const userStore = useUserStore();
     const authStore = useAuthStore();
@@ -70,18 +71,18 @@ function setupAccessGuard(router: Router) {
       }
 
       // 没有访问权限，跳转登录页面
-      if (to.fullPath !== LOGIN_PATH) {
-        return {
-          path: LOGIN_PATH,
-          // 如不需要，直接删除 query
-          query:
-            to.fullPath === preferences.app.defaultHomePath
-              ? {}
-              : { redirect: encodeURIComponent(to.fullPath) },
-          // 携带当前跳转的页面，登录后重新跳转该页面
-          replace: true,
-        };
-      }
+      // if (to.fullPath !== LOGIN_PATH) {
+      //   return {
+      //     path: LOGIN_PATH,
+      //     // 如不需要，直接删除 query
+      //     query:
+      //       to.fullPath === preferences.app.defaultHomePath
+      //         ? {}
+      //         : { redirect: encodeURIComponent(to.fullPath) },
+      //     // 携带当前跳转的页面，登录后重新跳转该页面
+      //     replace: true,
+      //   };
+      // }
       return to;
     }
 

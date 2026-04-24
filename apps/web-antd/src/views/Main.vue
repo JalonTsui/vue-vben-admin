@@ -4,6 +4,6 @@ defineEmits([]);
 defineExpose({});
 </script>
 <template>
-  <div>main</div>
+  <div class=" bg-amber-700">main</div>
 </template>
 <style lang="scss" scoped></style>

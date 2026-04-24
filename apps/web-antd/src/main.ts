@@ -14,11 +14,11 @@ async function initApplication() {
   const namespace = `${import.meta.env.VITE_APP_NAMESPACE}-${appVersion}-${env}`;
 
   // app偏好设置初始化
-  // await initPreferences({
-  //   extension: preferencesExtension,
-  //   namespace,
-  //   overrides: overridesPreferences,
-  // });
+  await initPreferences({
+    extension: preferencesExtension,
+    namespace,
+    overrides: overridesPreferences,
+  });
 
   // 启动应用并挂载
   // vue应用主要逻辑及视图

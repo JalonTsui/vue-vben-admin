@@ -23,3 +23,24 @@ pnpm -F ./internal/vite-config run stub
 ```bash
 git commit -m '' --no-verify
 ```
+
+## pnpm 和 npm sciprts中的钩子script
+在这个 scripts 中，属于 pnpm/npm 内置生命周期钩子（会在特定时机自动触发）的只有这 3 个：
+
+```bash
+# package.json中的scripts
+preinstall	执行 pnpm install 之前自动运行
+postinstall	执行 pnpm install 之后自动运行
+prepare	执行 pnpm install 之后自动运行（如果包未打包）；或在 pnpm publish 发布之前自动运行
+```
+
+pnpm 还有一个约定：自定义脚本也可以加 pre / post 前缀。比如如果你有：
+```json
+"scripts": {
+  "prebuild": "echo before build",
+  "build": "turbo build",
+  "postbuild": "echo after build"
+}
+```
+
+当你手动执行 pnpm run build 时，pnpm 会自动按顺序执行 prebuild → build → postbuild。

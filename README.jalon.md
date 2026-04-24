@@ -18,3 +18,8 @@ pnpm -F @vben/vite-config run stub
 # 也可以提供路径
 pnpm -F ./internal/vite-config run stub
 ```
+
+## 忽略git commit 时定义的校验钩子并直接提交
+```bash
+git commit -m '' --no-verify
+```

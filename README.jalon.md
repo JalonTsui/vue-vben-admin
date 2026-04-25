@@ -44,3 +44,14 @@ pnpm 还有一个约定：自定义脚本也可以加 pre / post 前缀。比如
 ```
 
 当你手动执行 pnpm run build 时，pnpm 会自动按顺序执行 prebuild → build → postbuild。
+
+## pnpm-worksapce 安装依赖
+memorepo项目一定要在根目录安装依赖，如果用pnpm -F 指定项目进行install的话，根目录的pnpm-workspace.yaml的依赖关系也会改变
+
+## 快速验证nodejs中的依赖位置
+```bash
+# 这会根据nodejs的依赖解析规则一层一层的解析依赖，并输出依赖的具体位置
+# 即： 当前package.json没有就会寻找上层的package.json
+# pnpm-workspace.yaml安装依赖时，实际上依赖都在根目录的node_modules中，子项目的node_modules实际上时建立了一层软连接
+node -e "console.log(require.resolve('packageName'))"
+```

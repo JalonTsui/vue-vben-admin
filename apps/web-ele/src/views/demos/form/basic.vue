@@ -8,6 +8,7 @@ import { ElButton, ElCard, ElCheckbox, ElMessage } from 'element-plus';
 import { useVbenForm } from '#/adapter/form';
 import { getAllMenusApi } from '#/api';
 
+// jalontsui useVbenForm 学习入口
 const [Form, formApi] = useVbenForm({
   commonConfig: {
     // 所有表单项

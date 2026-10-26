@@ -80,10 +80,13 @@ function handleKeyDownEnter(event: KeyboardEvent) {
   forward.value.formApi?.validateAndSubmit();
 }
 
+// 值变化防抖提交：submitOnChange 开启后，值变化不会立刻提交，而是防抖聚合（默认 300ms，可用 changeDebouncedTime 调整）
 const handleValuesChangeDebounced = useDebounceFn(async () => {
   state?.value.submitOnChange && forward.value.formApi?.validateAndSubmit();
 }, state?.value?.changeDebouncedTime ?? 300);
 
+// 守卫：挂载完成（且过了一个 tick）之前的值变化一律忽略，
+// 否则初始值同步进 form.values 的过程会误触发 handleValuesChange / submitOnChange
 let valuesChangeReady = false;
 
 onMounted(async () => {
@@ -92,6 +95,8 @@ onMounted(async () => {
   valuesChangeReady = true;
 });
 
+// 表单级值变化响应（注意：字段间联动 disabled/show/required 走 schema 的 dependencies，
+// 在 form-field.vue 的 useDependencies 里处理，不经过这里）
 watch(values, (currentValues, previousValues) => {
   if (!valuesChangeReady) {
     return;
@@ -101,6 +106,7 @@ watch(values, (currentValues, previousValues) => {
   if (!handleValuesChange && !submitOnChange) {
     return;
   }
+  // 逐字段比对，算出本次变化的字段名列表
   const fields = getFormFieldSchemas(state?.value.schema ?? []).map(
     (item) => item.fieldName,
   );
@@ -112,11 +118,13 @@ watch(values, (currentValues, previousValues) => {
       );
     });
     if (changedFields.length > 0) {
+      // 回调签名：(最新值, 变化的字段名数组, 格式化函数——内部走 codec 编码，调用时才执行)
       handleValuesChange(readonly(currentValues), changedFields, () =>
         formApi.formatValues(currentValues),
       );
     }
   }
+  // 自动提交：值变化 -> 防抖 -> 全量校验 -> 编码 -> handleSubmit（即 validateAndSubmit 链路）
   if (submitOnChange) {
     handleValuesChangeDebounced();
   }

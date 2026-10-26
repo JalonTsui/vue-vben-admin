@@ -150,6 +150,8 @@ dependencies: {
 
 ## 四、调试方法
 
+> 更详细的手动调试指南（完整调用链路 + 断点地图 + 故障排查手册）：见 `jalontsui_docs/vben-form-debug.md`。
+
 **1. 跑起来看**
 
 ```bash

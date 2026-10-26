@@ -42,12 +42,15 @@ export function useVbenForm(
   options: VbenFormProps<any, any, any, any>,
 ): UseVbenFormReturn<any, any, any, any> {
   const IS_REACTIVE = isReactive(options);
+  // 初始化表单操作api对象
   const api = new FormApi<any, any, any, any>(options);
+  // 表单操作扩展对象
   const extendedApi = api as ExtendedFormApi<any, any, any, any>;
   extendedApi.useStore = (selector: any) => {
     return useSelector(api.store, selector);
   };
 
+  // 初始化表单组件
   const Form = defineComponent(
     (props: VbenFormProps, { attrs, slots }) => {
       onBeforeUnmount(() => {

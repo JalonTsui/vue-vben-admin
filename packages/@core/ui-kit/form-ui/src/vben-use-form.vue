@@ -40,16 +40,24 @@ if (!formApi) {
 
 const state = formApi.useStore();
 
+// 表单配置（非字段值）：props 与 store 中的 options 按优先级合并后的视图（slot > attrs > props > store）
 const forward = useForwardPriorityValues(props, state);
 
+// 字段组件实例表：fieldName → 组件 ref，scrollToFirstError / getFieldComponentRef 使用
 const componentRefMap = new Map<string, unknown>();
 
+// 表单初始化（setup 阶段一次性）：
+// - form：引擎门面（FormActions），渲染层直接用它做值绑定/校验，稍后经 mount 交给 FormApi
+// - delegatedSlots：调用方传入的具名插槽名单，模板据此透传到对应字段
 const { delegatedSlots, form } = useFormInitial(forward);
+// 字段值（来自 tanstack 引擎，非上面的配置 state）；仅用于下方的 submitOnChange / handleValuesChange 监听
 const values = form.useValues();
 
+// 向下游 provide 渲染所需的全部上下文：配置视图 + 引擎门面，form-field 通过 inject 取用
 provideFormProps([forward, form]);
 provideComponentRefMap(componentRefMap);
 
+// 交接点：FormApi 正式持有引擎门面，此后业务层调 formApi.xxx() 才会真正落到引擎上
 formApi.mount(form, componentRefMap);
 
 function handleUpdateCollapsed(value: boolean) {

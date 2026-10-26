@@ -75,14 +75,25 @@ function normalizeSchemaForDefaults(rule: ZodType): ZodType {
   return rawRule;
 }
 
+/**
+ * 表单初始化：在组件 setup 阶段一次性完成三件事——
+ * 1. generateInitialValues()：从 schema 提取初始值快照（defaultValue 优先，其次 zod 推导）
+ * 2. useFormRuntime()：创建 tanstack 引擎实例并包装成引擎无关的门面 API（FormActions）
+ * 3. delegatedSlots：收集调用方传入的具名插槽名单，供模板逐层透传
+ * 注意：初始值只在 setup 时计算一次，之后 updateSchema 新增字段不会自动补初始值
+ */
 export function useFormInitial(
   props: ComputedRef<VbenFormProps> | VbenFormProps,
 ) {
   const slots = useSlots();
   const initialValues = generateInitialValues();
 
+  // 引擎门面：渲染层（form-field 等）与 FormApi 最终都通过它操作表单数据
   const form = useFormRuntime(initialValues);
 
+  // 调用方（页面）传入的非 default 插槽名字清单，如 ['username', 'actions']。
+  // 只存名字不存插槽本体；vben-use-form 模板据此为每个名字开 <template #[name]> 转发通道，
+  // 让页面写在 <Form> 上的字段级插槽能透传到对应 fieldName 的 FormField 里渲染
   const delegatedSlots = computed(() => {
     const resultSlots: string[] = [];
 
@@ -94,6 +105,7 @@ export function useFormInitial(
     return resultSlots;
   });
 
+  /** 初始值合成：schema.defaultValue 优先，其次按 zod rules 推导，最后 merge 两者 */
   function generateInitialValues() {
     const initialValues: Record<string, any> = {};
 

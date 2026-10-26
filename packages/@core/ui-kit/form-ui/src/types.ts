@@ -12,6 +12,7 @@ export type FormLabelWidthContext = UnwrapNestedRefs<
   ReturnType<typeof useFormLabelWidth>
 >;
 
+/** 表单值的通用形状：以字段名为 key 的记录对象。默认场景下不去约束具体字段。 */
 export type FormValues = Record<string, any>;
 
 export type FormValuePatch<T> = T extends
@@ -23,6 +24,11 @@ export type FormValuePatch<T> = T extends
     ? { [K in keyof T]?: FormValuePatch<T[K]> }
     : T;
 
+/**
+ * 表单组件值与提交值之间的双向编解码器（替代旧的 valueFormat / fieldMappingTime）。
+ * @template TFormValues - 表单组件内的值类型
+ * @template TSubmitValues - encode 之后的提交值类型，默认等于 TFormValues
+ */
 export interface FormCodec<
   TFormValues extends FormValues = FormValues,
   TSubmitValues extends FormValues = TFormValues,
@@ -33,10 +39,16 @@ export interface FormCodec<
   encode: (values: Readonly<TFormValues>) => TSubmitValues;
 }
 
+/**
+ * 字段名字符串类型。
+ * 当 TValues 是具体接口时，只保留它的 key（带来自动补全）；
+ * `Record<never, never> & string` 技巧：在保留字面量联合提示的同时允许任意字符串（适配嵌套路径如 `a.b`）。
+ */
 export type FormFieldName<TValues extends FormValues = FormValues> =
   | Extract<keyof TValues, string>
   | (Record<never, never> & string);
 
+/** 取某个字段名对应的值类型；字段名不在 TValues 中时为 unknown。 */
 export type FormFieldValue<
   TValues extends FormValues,
   TFieldName extends string,
@@ -44,6 +56,11 @@ export type FormFieldValue<
 
 export type FormLayout = 'horizontal' | 'inline' | 'vertical';
 
+/**
+ * 核心库内置的组件类型（shadcn 组件 + 按钮）。
+ * 应用侧通过 adapter 扩展自己的组件名，并把扩展后的联合类型传给各接口的泛型 T。
+ * `Record<never, never> & string` 表示"任意字符串，但保留内置字面量的补全"。
+ */
 export type BaseFormComponentType =
   | 'DefaultButton'
   | 'PrimaryButton'
@@ -101,6 +118,12 @@ export interface FormRuntimeField<TValue = unknown> {
   };
 }
 
+/**
+ * form-field.vue 手工组装后传给业务组件的绑定对象（v-model 协议）：
+ * 不依赖组件内部的 v-model 实现，只要业务组件遵守
+ * "值属性 + onUpdate:值属性" 的约定即可接入。
+ * 值属性名特殊的组件（如 antd 的 checked）由 COMPONENT_BIND_EVENT_MAP 改写。
+ */
 export interface FormComponentField<
   TValue = unknown,
   TFieldName extends string = string,
@@ -157,6 +180,14 @@ export interface FormResetOptions {
   keepDefaultValues?: boolean;
 }
 
+/**
+ * 表单引擎门面（Facade）接口：定义上层可用的全部表单操作。
+ * 刻意保持引擎无关 —— 方法名不含 @tanstack/vue-form 或 vee-validate 的概念，
+ * 目前唯一实现在 form-runtime.ts（基于 @tanstack/vue-form）。
+ * FormApi、form-field.vue、dependencies 回调都只依赖本接口。
+ * @template TValues - 表单值类型，贯穿所有字段读写与校验方法
+ * @see FormActions（旧别名，已废弃）
+ */
 export interface FormContextApi<TValues extends FormValues = FormValues> {
   clearValidation: (
     fieldNames?: FormFieldName<TValues> | FormFieldName<TValues>[],
@@ -212,7 +243,10 @@ export interface FormContextApi<TValues extends FormValues = FormValues> {
   readonly values: TValues;
 }
 
-/** @deprecated Use `FormContextApi` instead. */
+/**
+ * `FormContextApi` 的旧别名。新代码请直接使用 `FormContextApi`。
+ * @deprecated Use `FormContextApi` instead.
+ */
 export type FormActions<TValues extends FormValues = FormValues> =
   FormContextApi<TValues>;
 
@@ -228,6 +262,7 @@ type KnownFormFieldName<TValues extends FormValues> =
     ? never
     : Exclude<Extract<keyof TValues, string>, ReservedFormSlotName>;
 
+/** 表单默认插槽 / 操作区插槽的参数。泛型约定同 {@link VbenFormProps}。 */
 export interface VbenFormActionSlotProps<
   TValues extends FormValues = FormValues,
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -238,6 +273,7 @@ export interface VbenFormActionSlotProps<
   values: TValues;
 }
 
+/** 表单主插槽（default）的参数，在操作区插槽参数基础上增加字段形状信息。 */
 export interface VbenFormDefaultSlotProps<
   TValues extends FormValues = FormValues,
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -247,6 +283,10 @@ export interface VbenFormDefaultSlotProps<
   shapes: FormShape[];
 }
 
+/**
+ * 单个字段插槽的参数：自定义某字段渲染（`fieldName` 插槽）时拿到的一切。
+ * @template TFieldName - 当前字段名，用于精确推出该字段的值类型
+ */
 export interface VbenFormFieldSlotProps<
   TValues extends FormValues = FormValues,
   TFieldName extends FormFieldName<TValues> = FormFieldName<TValues>,
@@ -317,6 +357,7 @@ type VbenFormFieldSlots<
         ) => any;
       };
 
+/** Form 组件的插槽集合：字段插槽（按 fieldName 命名）+ 内置的几个具名插槽。 */
 export type VbenFormSlots<
   TValues extends FormValues = FormValues,
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -340,6 +381,7 @@ export type VbenFormSlots<
   ) => any;
 };
 
+/** `useVbenForm` 返回的 Form 组件的构造函数签名（用于模板中的类型推导）。 */
 export type VbenFormComponent<
   TValues extends FormValues = FormValues,
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -412,15 +454,21 @@ interface FormItemDependenciesBase {
   triggerFields: string[];
 }
 
+/** 新式 dependencies.resolve 回调收到的上下文。 */
 export interface FormDependenciesResolveContext<
   TValues extends FormValues = FormValues,
 > {
+  /** 引擎门面：读写字段值、触发校验等 */
   actions: FormActions<TValues>;
+  /** 完整 FormApi（含 updateSchema 等控制能力） */
   controller: ExtendedFormApi<TValues>;
+  /** 当前字段的上下文（数组字段时的真实字段名等） */
   schema: FormSchemaContext<TValues>;
+  /** 表单当前全部值（只读） */
   values: Readonly<TValues>;
 }
 
+/** dependencies.resolve 允许返回的字段状态补丁。 */
 export interface FormDependenciesResolvedState {
   componentProps?: MaybeComponentProps;
   disabled?: boolean;
@@ -504,6 +552,10 @@ type ComponentProps<TValues extends FormValues = FormValues> =
   | ((ctx: FormSchemaContext<TValues>) => MaybeComponentProps)
   | MaybeComponentProps;
 
+/**
+ * 表单项的通用配置：既可用作 schema 单字段的属性（FormSchemaBody 继承它），
+ * 也可通过表单的 `commonConfig` 批量下发（字段级配置优先）。
+ */
 export interface FormCommonConfig<TValues extends FormValues = FormValues> {
   /**
    * 是否启用 change 事件兼容回退。
@@ -724,7 +776,14 @@ export interface FormGroupSchema<
 }
 
 /**
- * 单个表单字段的 schema（普通字段 / 数组字段）
+ * 单个表单字段的 schema（普通字段 / 数组字段）。
+ * 三种形态判别联合：
+ * - FormSchemaDiscriminated：component 是 P 里已登记的组件名时，componentProps 按该组件精确提示
+ * - FormArraySchema：`type: 'array'` + children，渲染为内置数组编辑器
+ * - FormSchemaFallback：兜底，component 直接传 Vue 组件对象
+ * @template T - 组件名字符串联合
+ * @template P - 组件 props 映射表（ComponentPropsMap）
+ * @template TValues - 表单值类型，用于给 componentProps 函数、dependencies 等回调提供值类型
  */
 export type FormFieldSchema<
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -737,6 +796,7 @@ export type FormFieldSchema<
 
 /**
  * 表单 schema 项：字段或分组，以 `type` 区分
+ * （缺省 type 即为字段）。
  */
 export type FormSchema<
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -811,6 +871,7 @@ export type ArrayToStringFields = Array<
   | string[] // 简单数组格式，最后一个元素可以是分隔符
 >;
 
+/** 规范化之后传给 FormField 组件的单个字段 props（渲染层内部使用）。 */
 export interface FormFieldProps<
   T extends BaseFormComponentType = BaseFormComponentType,
   TValues extends FormValues = FormValues,
@@ -821,6 +882,11 @@ export interface FormFieldProps<
   componentProps?: ComponentProps<TValues>;
 }
 
+/**
+ * 渲染层（Form 组件）的 props：布局、schema、组件映射、折叠等。
+ * 其中 `componentMap` / `componentBindEventMap` / `form` 由 vben-use-form.vue 内部注入，
+ * 所以 VbenFormProps 用 Omit 把它们排除在外，用户无需传。
+ */
 export interface FormRenderProps<
   T extends BaseFormComponentType = BaseFormComponentType,
   P extends Record<string, any> = Record<never, never>,
@@ -901,11 +967,19 @@ export interface ActionButtonOptions extends VbenButtonProps {
   show?: boolean;
 }
 
+/**
+ * `useVbenForm` 传入的配置参数类型。
+ * @template T - 组件名字符串联合类型（应用侧在 adapter 中扩展，如 'Input' | 'Select'）
+ * @template P - 组件 props 映射表（ComponentPropsMap），用于按 component 精确提示 componentProps
+ * @template TValues - 表单值类型（handleSubmit 收到的 values 的源头类型）
+ * @template TSubmitValues - 提交值类型；使用 codec 做值转换时可与 TValues 不同，默认等于 TValues
+ */
 export interface VbenFormProps<
   T extends BaseFormComponentType = BaseFormComponentType,
   P extends Record<string, any> = Record<never, never>,
   TValues extends FormValues = FormValues,
   TSubmitValues extends FormValues = TValues,
+  // Omit 排除A中B选项
 > extends Omit<
   FormRenderProps<T, P, TValues>,
   'componentBindEventMap' | 'componentMap' | 'form'
@@ -1000,6 +1074,10 @@ export interface VbenFormProps<
   submitOnEnter?: boolean;
 }
 
+/**
+ * `useVbenForm` 返回的元组第二个元素：FormApi + 响应式状态读取能力。
+ * `useStore(selector)` 可精确订阅表单配置状态的某一部分（基于 @vben-core/shared/store）。
+ */
 export type ExtendedFormApi<
   TValues extends FormValues = FormValues,
   T extends BaseFormComponentType = BaseFormComponentType,
@@ -1013,6 +1091,10 @@ export type ExtendedFormApi<
   ) => Readonly<Ref<TResult>>;
 };
 
+/**
+ * `setupVbenForm` 的适配参数：组件值绑定协议（config）与字符串校验规则（rules）。
+ * 应用 adapter（如 apps/web-ele/src/adapter/form.ts）在启动时调用一次。
+ */
 export interface VbenFormAdapterOptions<
   T extends BaseFormComponentType = BaseFormComponentType,
 > {

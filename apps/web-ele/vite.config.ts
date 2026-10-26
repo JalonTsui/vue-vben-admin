@@ -4,7 +4,9 @@ import ElementPlus from 'unplugin-element-plus/vite';
 
 export default defineConfig(async () => {
   return {
-    application: {},
+    application: {
+      devtools: true,
+    },
     vite: {
       plugins: [
         // element-plus 的 css 包进 @layer el，使 Tailwind 工具类可覆盖组件样式

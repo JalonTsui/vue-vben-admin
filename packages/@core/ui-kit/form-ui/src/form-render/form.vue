@@ -66,10 +66,12 @@ provideFormRenderProps(reactive({ ...toRefs(props), ...useFormLabelWidth() }));
 // @ts-expect-error unused
 const { isCalculated, keepFormItemIndex, wrapperRef } = useExpandable(props);
 
+// 获取表单schema
 const formFieldSchemas = computed(() => {
   return getFormFieldSchemas(props.schema ?? []);
 });
 
+// schema静态视图，方便页面直接使用计算后的属性
 const shapes = computed(() => {
   const resultShapes: FormShape[] = [];
   formFieldSchemas.value.forEach((schema) => {
@@ -115,6 +117,7 @@ function normalizeFieldSchema(schema: FormFieldSchema, hidden = false) {
   });
 }
 
+// 动态的schema
 const computedSchema = computed(
   (): Array<NormalizedFormFieldSchema | NormalizedFormGroupSchema> => {
     const keepIndex = keepFormItemIndex.value;

@@ -1,0 +1,25 @@
+{
+  "name": "@jalontsui/tanstack-store-playground",
+  "version": "0.0.1",
+  "description": "TanStack Store 独立示例包：本目录 README 即模块文档（module-guides），示例可直接运行",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo:01": "node examples/node/01-basics.mjs",
+    "demo:02": "node examples/node/02-traps.mjs",
+    "demo:03": "node examples/node/03-advanced.mjs",
+    "demo": "node examples/node/01-basics.mjs && node examples/node/02-traps.mjs && node examples/node/03-advanced.mjs",
+    "test": "vitest run",
+    "dev": "vite examples/vue"
+  },
+  "dependencies": {
+    "@tanstack/store": "catalog:",
+    "@tanstack/vue-store": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "happy-dom": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

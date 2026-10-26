@@ -1034,7 +1034,7 @@ importers:
         specifier: 'catalog:'
         version: 1.0.7
 
-  module-guides/tanstack-store-playground:
+  module-guides/tanstack-store:
     dependencies:
       '@tanstack/store':
         specifier: 'catalog:'

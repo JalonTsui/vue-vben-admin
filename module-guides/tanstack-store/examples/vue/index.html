@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TanStack Store Vue 示例</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 40px auto;
+        color: #333;
+      }
+      button {
+        margin-right: 8px;
+        padding: 4px 12px;
+        cursor: pointer;
+      }
+      .box {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 12px;
+      }
+      code {
+        background: #f4f4f4;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>@tanstack/vue-store 最小示例</h1>
+    <p>
+      三个组件各自用 <code>useSelector</code> 订阅同一个 Store
+      的不同切片，点按钮观察只有受影响的组件重新渲染。
+    </p>
+    <div id="app"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

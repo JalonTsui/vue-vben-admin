@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue 插槽转发最小示例</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 720px;
+        margin: 40px auto;
+        color: #333;
+        line-height: 1.6;
+      }
+      .page,
+      .middle,
+      .leaf {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 12px;
+      }
+      .leaf {
+        border-color: #b3d8ff;
+        background: #f5faff;
+      }
+      .no-forward {
+        border-color: #ffb3b3;
+        background: #fff5f5;
+      }
+      .user-content {
+        color: #1677ff;
+        font-weight: 600;
+      }
+      code {
+        background: #f4f4f4;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Vue 插槽转发：vben-use-form.vue:136-147 的最小复刻</h1>
+    <p>
+      上面是<span style="color: #1677ff">有转发</span>的三层链路，下面是<span
+        style="color: #f5222d"
+        >不转发</span
+      >的对照组。
+    </p>
+    <div id="app"></div>
+    <div id="app-no-forward"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

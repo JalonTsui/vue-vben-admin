@@ -1,0 +1,21 @@
+{
+  "name": "@jalontsui/vue-slot-forwarding",
+  "version": "0.0.1",
+  "description": "Vue 插槽转发最小示例：复刻 vben-use-form.vue 的动态插槽转发写法（SFC）",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "dev": "vite examples"
+  },
+  "dependencies": {
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "happy-dom": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

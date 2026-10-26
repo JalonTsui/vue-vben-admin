@@ -17,5 +17,6 @@ vben 的表单、表格、弹窗等核心能力都建立在一层"薄而陌生"�
 | 模块 | 上游仓库 | 文档 + 示例包（同一目录，可直接运行） | 版本（本仓库） |
 | --- | --- | --- | --- |
 | `@tanstack/store` / `@tanstack/vue-store` | [TanStack/store](https://github.com/TanStack/store) | [tanstack-store/](./tanstack-store/)（README 即模块文档；含 node 脚本 + Vue 测试 + 浏览器 demo） | 0.11.2 |
+| Vue 插槽转发（语言特性，非第三方模块） | [vuejs/core](https://github.com/vuejs/core) | [vue-slot-forwarding/](./vue-slot-forwarding/)（SFC 三层转发链路 + 5 个行为断言 + 不转发对照组 demo） | Vue 3.5 |
 
 目录约定：**一个模块一个目录**，目录本身就是 pnpm workspace 包（根 `pnpm-workspace.yaml` 的 `module-guides/*` 直接匹配），模块文档放在包根的 `README.md`，示例放 `examples/`。依赖走仓库 catalog，与主项目共用 lockfile，不参与 turbo 构建。新增模块时复制 `tanstack-store/` 的结构即可。

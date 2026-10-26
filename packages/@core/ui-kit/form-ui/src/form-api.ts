@@ -146,10 +146,13 @@ export class FormApi<
     null;
 
   constructor(options: FormApiProps<TFormValues, T, P, TSubmitValues> = {}) {
+    // 复制一层传入的配置到变量storeState
     const { ...storeState } = options;
 
+    // 初始化状态
     const defaultState = getDefaultState<TFormValues, T, P, TSubmitValues>();
 
+    // 用Store管理表单状态，并用传入的配置覆盖初始化配置
     this.store = new Store<FormApiProps<TFormValues, T, P, TSubmitValues>>({
       ...defaultState,
       ...storeState,

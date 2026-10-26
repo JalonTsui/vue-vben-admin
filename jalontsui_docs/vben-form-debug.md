@@ -1,8 +1,6 @@
 # VbenForm 手动 Debug 调试指南（附完整调用链路）
 
-> 配套文档：`jalontsui_docs/vben-form.md`（架构学习指南）。本文专注"出了问题怎么查"。
-> 所有行号基于 `packages/@core/ui-kit/form-ui/src`（下称 `src/`），已针对当前 fork 源码核对。
-> 校验引擎是 `@tanstack/vue-form` + zod（不是 vee-validate），浏览器控制台断点调试前请先记住这一点。
+> 配套文档：`jalontsui_docs/vben-form.md`（架构学习指南）。本文专注"出了问题怎么查"。所有行号基于 `packages/@core/ui-kit/form-ui/src`（下称 `src/`），已针对当前 fork 源码核对。校验引擎是 `@tanstack/vue-form` + zod（不是 vee-validate），浏览器控制台断点调试前请先记住这一点。
 
 ---
 
@@ -174,54 +172,54 @@ handleValuesChange 回调签名（:96-111）：(values, changedFields, formatVal
 ### 初始化问题（值不对 / 不渲染 / api 死等）
 
 | 想看的 | 断点 | 备注 |
-|---|---|---|
+| --- | --- | --- |
 | FormApi 构造入参 | `use-vben-form.ts:44` | options 是否 reactive 看 :43 |
-| props 与 reactive schema 两条 setState 入口 | `use-vben-form.ts:55` / `:69` | |
-| Store 初始 state | `form-api.ts:148-167` | |
-| schema 变更 diff、被删字段 | `form-api.ts:665` updateState | |
+| props 与 reactive schema 两条 setState 入口 | `use-vben-form.ts:55` / `:69` |  |
+| Store 初始 state | `form-api.ts:148-167` |  |
+| schema 变更 diff、被删字段 | `form-api.ts:665` updateState |  |
 | 展平后的 schema 列表 | `use-form-context.ts:101` | 分组是否展开 |
-| 字段走 defaultValue 还是 zod 分支 | `use-form-context.ts:102` / `:104` | |
-| zodObject 内容、zod-defaults 原始结果 | `use-form-context.ts:115` | |
-| 合并前后 initialValues 与 zodDefaults | `use-form-context.ts:121` | |
-| 传给 tanstack 的最终 defaultValues | `form-runtime.ts:42` | |
+| 字段走 defaultValue 还是 zod 分支 | `use-form-context.ts:102` / `:104` |  |
+| zodObject 内容、zod-defaults 原始结果 | `use-form-context.ts:115` |  |
+| 合并前后 initialValues 与 zodDefaults | `use-form-context.ts:121` |  |
+| 传给 tanstack 的最终 defaultValues | `form-runtime.ts:42` |  |
 | mount 时序、初始值编码成败 | `form-api.ts:338-366` | catch 分支在 :351/:354 |
 | api 调用挂起/恢复 | `form-api.ts:647` getForm | waitForCondition / throw 点 :653 |
 
 ### 渲染问题（组件不显示 / props 不对 / 星号不对）
 
 | 想看的 | 断点 | 备注 |
-|---|---|---|
-| 每次 schema 变化后的最终渲染列表 | `form-render/form.vue:118` computedSchema | |
+| --- | --- | --- |
+| 每次 schema 变化后的最终渲染列表 | `form-render/form.vue:118` computedSchema |  |
 | commonConfig 合并、规范化结果 | `form-render/schema.ts:421` | 数组分支 :446 |
 | 组件解析结果 | `form-field.vue:105` | 未注册 warn 在 :111 |
-| 必填星号判断 | `form-field.vue:152` | |
-| 实际生效的校验触发器集合 | `form-field.vue:225` fieldValidators | |
+| 必填星号判断 | `form-field.vue:152` |  |
+| 实际生效的校验触发器集合 | `form-field.vue:225` fieldValidators |  |
 | refMap 写入/删除（getFieldComponentRef 相关） | `form-field.vue:495` | onUnmounted 时 delete |
-| 特殊 model 属性名改写 | `form-field.vue:372` / `:379` | |
-| 最终 COMPONENT_MAP 内容 | `config.ts:115` replaceRecord | |
+| 特殊 model 属性名改写 | `form-field.vue:372` / `:379` |  |
+| 最终 COMPONENT_MAP 内容 | `config.ts:115` replaceRecord |  |
 
 ### 校验 / 提交问题
 
 | 想看的 | 断点 | 备注 |
-|---|---|---|
+| --- | --- | --- |
 | 每次字段校验的入参值与分支 | `form-field.vue:193` validateFieldValue | zod 走 :217，字符串规则走 :200 |
 | 全量校验后两路错误合并 | `form-runtime.ts:165` / `:92` getErrors | manualErrors 是否混入 |
-| 手动错误写入/清除 | `form-runtime.ts:174` setFieldError | |
+| 手动错误写入/清除 | `form-runtime.ts:174` setFieldError |  |
 | 异步校验竞态丢弃 | `form-runtime-field.ts:48` | validationRunId |
 | 提交主入口、校验失败分支 | `form-api.ts:619` validateAndSubmit | :621 valid=false 直接 return |
-| 提交前的 encode 结果 | `form-api.ts:658` submitValues | |
+| 提交前的 encode 结果 | `form-api.ts:658` submitValues |  |
 | codec.encode 抛错第一现场 | `form-codec.ts:31` | FormCodecError |
-| submitOnChange / handleValuesChange 触发 | `vben-use-form.vue:87` | |
+| submitOnChange / handleValuesChange 触发 | `vben-use-form.vue:87` |  |
 | setValues 的过滤前后差异 | `form-api.ts:504` | filtered 在 :556 |
 | updateSchema 补丁与报错 | `form-api.ts:586` | 无 fieldName 报错在 :592 |
 
 ### dependencies 联动问题
 
 | 想看的 | 断点 | 备注 |
-|---|---|---|
-| triggerFields 值变化、context 内容、resolve vs legacy 分支 | `form-render/dependencies.ts:222` watch cb | |
-| 字段取值方式（嵌套名 `'[a.b]'` 不拆分） | `form-render/dependencies.ts:59` | |
-| 竞态丢弃过期结果 | `form-render/dependencies.ts:262` | |
+| --- | --- | --- |
+| triggerFields 值变化、context 内容、resolve vs legacy 分支 | `form-render/dependencies.ts:222` watch cb |  |
+| 字段取值方式（嵌套名 `'[a.b]'` 不拆分） | `form-render/dependencies.ts:59` |  |
+| 竞态丢弃过期结果 | `form-render/dependencies.ts:262` |  |
 
 ---
 
@@ -230,22 +228,26 @@ handleValuesChange 回调签名（:96-111）：(values, changedFields, formatVal
 ### 3.1 渲染类
 
 **症状：某字段整个不渲染**
+
 - 首查 `form.vue:132`：分组 `hide` 或 children 为空会被跳过。
 - 再看 form-field 的 `v-if="!hide && isIf"`（:507）：`hide` 来自 schema，`isIf` 来自 dependencies 的 `if`（patch.if === false 时 legacy 模式后续 patch 全部不求值，dependencies.ts:136）。
 - 验证：断 `computedSchema`（form.vue:118）确认该字段是否进了渲染列表；进了再看 `isIf/isShow`。
 
 **症状：字段渲染了但是空的（组件没出来）**
+
 - 控制台必有 warn：`Component X is not registered`（form-field.vue:111）。
 - 原因链：组件名拼错 / `initComponentAdapter()` 没执行 / `setupVbenForm` 在首次渲染之后才调用。
 - 验证：断 `config.ts:115` 看最终 COMPONENT_MAP 有没有这个 key；`apps/web-ele/src/bootstrap.ts` 确认两个 init 的顺序。
 
 **症状：必填星号或必填行为不对**
+
 - 断 `form-field.vue:152` shouldRequired。zod 规则看 `!rules.isOptional()`；字符串规则看白名单 `['required','selectRequired']`。
 - 注意：`rules: 'required'`（字符串）和 zod 的 `z.string().optional()` 表现不同，前者恒必填。
 
 ### 3.2 值类
 
 **症状：初始值缺失 / 不对**
+
 - 断 `use-form-context.ts:102`：该字段是否走了 defaultValue 分支短路。
   - `defaultValue: undefined` 也会短路（Reflect.has 判定），zod 兜底被跳过——这是最常见的坑。
 - 断 `:104`：rules 是字符串名（如 `'required'`）时进不了 zod 分支，初始值为 undefined。
@@ -253,60 +255,70 @@ handleValuesChange 回调签名（:96-111）：(values, changedFields, formatVal
 - 最后断 `form-runtime.ts:42` 确认传给 tanstack 的 defaultValues。
 
 **症状：updateSchema 新增了字段，值为 undefined**
+
 - 原因：`useFormRuntime` 只在 setup 跑一次，initialValues 是挂载快照；`updateState` 只处理**被删**字段（form-api.ts:669），不补新字段值。
 - 解法：updateSchema 后手动 `formApi.setValues({ 新字段: 初始值 })`。
 
 **症状：setValues 设置了值但界面上某字段没更新**
+
 - setValues 默认 `filterFields=true`：值会按 schema 字段路径过滤（form-api.ts:523-557），不在任何 schema 路径前缀上的 key 被丢弃。
 - 验证：断 :556 看 filtered 结果；fieldName 写错（如嵌套名写成 `a.b` 但实际 schema 是扁平的）是最常见原因。
 
 **症状：change 回调里拿到的 values 是上一次提交的**
+
 - submitValues 之后才 `setLatestSubmissionValues`（form-api.ts:660）；若你在 handleSubmit 内部又调 getValues，拿到的是本次值，若在外面 watch 则需注意时序。
 
 ### 3.3 校验类
 
 **症状：必填规则没拦住提交**
+
 - 控制台是否有 `Form rule X is not registered`（form-field.vue:202）？→ 字符串规则没注册会被**静默跳过**。
 - 该字段是否可见？不可见字段 fieldRules 为 null（form-field.vue:172），校验直接通过。
 - 断 `form-field.vue:225` 确认 onSubmitAsync 是否真的挂了。
 
 **症状：手动 setFieldError 的错误不显示 / 不消失**
+
 - 显示：断 `form-runtime.ts:130` useFieldError（manualErrors 优先于 tanstack 错误）。
 - 消失：用户输入触发 handleChange 会先清手动错误（form-field.vue:356）。若业务依赖"错误持续显示"，别在用户输入路径上覆盖。
 - 阻止提交：manualErrors 会并入 getErrors（form-runtime.ts:92），validate() 同样失败。
 
 **症状：异步校验结果错乱（旧结果覆盖新结果）**
+
 - 看竞态保护是否生效：断 `form-runtime-field.ts:48`。若你在 resolve 里自己另起请求而不复用 validators 机制，则无此保护。
 
 **症状：dependencies 联动不触发 / 触发错**
+
 - `triggerFields` 写错字段名**无任何 warn**，resolve 收到 undefined，可能把字段错误地 show/disabled 掉（dependencies.ts:59）。先核字段名拼写。
 - 断 `dependencies.ts:222` 看 watch 是否真的进了 cb；`isEqual` 相同值会直接 return（:232）。
 - legacy 回调里 `if` 返回 false 会直接 return，show/componentProps/rules 等全部不求值（:136）。
 
 ### 3.4 提交类
 
-**症状：点提交按钮业务回调没执行**
-按顺序查：
+**症状：点提交按钮业务回调没执行** 按顺序查：
+
 1. 控制台有 `Form rule X is not registered`？→ 校验被跳过通常不是原因（跳过=通过）；更常见是有字段校验失败但 UI 没显示（字段被 hide/if 隐藏，错误渲染不出来）。
 2. 断 `form-api.ts:619` → `:605` → form-runtime.ts:165，看 validate 返回值和 getErrors() 的合并结果。
 3. 若 validate 过了，断 `:658` submitValues → `form-codec.ts:31`：codec.encode 抛错会**整体 throw**，回调不执行且无业务侧 catch 时只在控制台看到 FormCodecError。
 4. 确认走的是哪条提交路径（validateAndSubmit / submit / 原生 submit / submitOnChange，见链路 D）。
 
 **症状：提交的值格式不对（日期、数组等）**
+
 - 断 `form-api.ts:176` formatValues：有 codec 走 codec.encode，无 codec 走旧 formatFormValues。codec 与 valueFormat/fieldMappingTime/arrayToStringFields 混用会 console deprecation warn（:685）。
 
 **症状：submitOnChange 频繁触发或一次改动触发两次**
+
 - 防抖时间默认 300ms 或 `changeDebouncedTime`（vben-use-form.vue:75-77）。
 - 初始值同步是否误触发？`valuesChangeReady`（:79-85）在 onMounted + nextTick 之后才为 true。
 
 **症状：api 调用不返回 / 抛 `<VbenForm /> is not mounted`**
+
 - `<VbenUseForm>` 根本没渲染（比如 v-if 包着）时，所有经 getForm 的调用会一直等 stateHandler。
 - 组件已卸载后调用也会 reject/throw。排查：确认 Form 组件在模板里真实挂载，断 `form-api.ts:647` 看挂起点。
 
 ### 3.5 控制台消息对照表
 
 | 消息 | 出处 | 含义 |
-|---|---|---|
+| --- | --- | --- |
 | `Form api is required in <VbenUseForm />` | vben-use-form.vue:37 | 手工 h() 或封装时漏传 formApi |
 | `Component X is not registered` | form-field.vue:111 | 组件名未注册，字段渲染为空，值恒 undefined |
 | `Form rule X is not registered` | form-field.vue:202 | 字符串规则未注册，该校验被静默跳过 |

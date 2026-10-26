@@ -1,7 +1,6 @@
 # VbenForm 学习指南
 
-> 基于本仓库（JalonTsui/vue-vben-admin fork, v5.7.0）源码整理。
-> 注意：本 fork 与上游 vbenjs/vue-vben-admin 差异很大 —— **校验引擎已从 vee-validate 换成 `@tanstack/vue-form` + zod**，组件注册也改成了两段式（见下文）。看官方文档时要留心这一点。
+> 基于本仓库（JalonTsui/vue-vben-admin fork, v5.7.0）源码整理。注意：本 fork 与上游 vbenjs/vue-vben-admin 差异很大 —— **校验引擎已从 vee-validate 换成 `@tanstack/vue-form` + zod**，组件注册也改成了两段式（见下文）。看官方文档时要留心这一点。
 
 ---
 
@@ -15,6 +14,7 @@ pnpm dev:ele          # 等价于 pnpm -F @vben/web-ele run dev
 ```
 
 打开页面路由 `/demos/form/basic` 即可。应用启动时会执行 `apps/web-ele/src/bootstrap.ts`，其中依次调用：
+
 1. `initComponentAdapter()` —— 注册 element-plus 组件
 2. `initSetupVbenForm()` —— 注册表单规则与特殊 model 映射
 
@@ -25,7 +25,7 @@ pnpm dev:ele          # 等价于 pnpm -F @vben/web-ele run dev
 ### 应用层（你自己改代码的地方）
 
 | 文件 | 作用 |
-|---|---|
+| --- | --- |
 | `apps/web-ele/src/adapter/form.ts` | `useVbenForm` 封装：调 `setupVbenForm({ config, rules })` 注册规则，注入本应用的组件类型泛型后转发给 `@vben/common-ui` 的 `useForm`；重导出 `z`、`VbenFormSchema`、`VbenFormProps` |
 | `apps/web-ele/src/adapter/component/index.ts` | 组件适配器：`defineAsyncComponent` 按需加载 element-plus 组件，包装成 `ComponentType → Component` 映射，最后 `globalShareState.setComponents(components)` 写入全局共享状态 |
 | `apps/web-ele/src/bootstrap.ts` | 应用启动时执行两个 init |
@@ -36,7 +36,7 @@ pnpm dev:ele          # 等价于 pnpm -F @vben/web-ele run dev
 经 `packages/effects/common-ui/src/components/index.ts` 以 `@vben/common-ui` 名义导出。
 
 | 文件 | 行数 | 职责 |
-|---|---|---|
+| --- | --- | --- |
 | `src/use-vben-form.ts` | 81 | hook 本体：`new FormApi(options)`，渲染 `VbenUseForm`，返回 `[Form, formApi]` 元组；options 是 reactive 时会 watch schema |
 | `src/form-api.ts` | 751 | `FormApi` 类：`setValues / getValues / validate / submit / reset / updateSchema / setFieldValue / scrollToFirstError / getFieldComponentRef` 等。状态存在 `@vben-core/shared/store` 里 |
 | `src/use-form-context.ts` | 148 | 从 schema 的 `defaultValue` / zod rules 提取初始值（用 `zod-defaults`），创建 form runtime，provide context |
@@ -176,6 +176,7 @@ pnpm test:benchmark   # form-api/form-runtime 的 benchmark
 **4. 源码断点**
 
 关键断点位置：
+
 - `form-field.vue` —— 看组件解析、依赖计算、校验触发
 - `form-api.ts` 的 `setValues` / `getValues` —— 看值如何过滤/格式化
 - `config.ts` 的 `setupVbenForm` —— 看组件注册是否生效
@@ -196,11 +197,13 @@ pnpm test:benchmark   # form-api/form-runtime 的 benchmark
 **Step 2 — 掌握 formApi**：在页面里加按钮调 `formApi.setValues()` / `formApi.validate()` / `formApi.getValues()`，理解 api 与 UI 的分离。
 
 **Step 3 — 动态化**：
+
 - 用 `dependencies` 实现字段联动（显隐、禁用、必填）；
 - 用 `formApi.updateSchema()` 运行时改 schema；
 - 把 schema 抽出来由后端接口下发，前端只负责渲染 —— 这就是"动态表单"的核心闭环。
 
 **Step 4 — 接入自定义组件**：
+
 1. 在 `apps/web-ele/src/adapter/component/index.ts` 注册你的组件（注意约定：值属性默认 `modelValue` + `onUpdate:modelValue`，不一致就用 `config.modelPropNameMap` 声明）；
 2. 扩展 `ComponentPropsMap` 类型让 `componentProps` 有类型提示；
 3. 在 `adapter/form.ts` 的 `useVbenForm` 泛型里带上新类型。

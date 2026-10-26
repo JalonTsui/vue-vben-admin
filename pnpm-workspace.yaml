@@ -12,6 +12,7 @@ packages:
   - scripts/*
   - docs
   - playground
+  - module-guides/*
 
 publicHoistPattern:
   - lefthook
@@ -31,10 +32,10 @@ minimumReleaseAge: 0
 
 overrides:
   '@ast-grep/napi': 'catalog:'
-  prosemirror-view: ^1.42.6
   '@ctrl/tinycolor': 'catalog:'
   clsx: 'catalog:'
   pinia: 'catalog:'
+  prosemirror-view: ^1.42.6
   vue: 'catalog:'
 
 catalog:
@@ -99,7 +100,6 @@ catalog:
   '@vueuse/core': ^15.0.0
   '@vueuse/integrations': ^15.0.0
   '@vueuse/motion': ^3.0.3
-  ant-design-vue: ^4.2.6
   antdv-next: ^1.4.5
   archiver: ^8.0.0
   axios: ^1.18.1
@@ -146,7 +146,6 @@ catalog:
   lefthook: ^2.1.14
   lodash.clonedeep: ^4.5.0
   medium-zoom: ^1.1.0
-  naive-ui: ^2.44.1
   nitropack: ^2.13.4
   nprogress: ^0.2.0
   ora: ^9.4.1
@@ -181,7 +180,6 @@ catalog:
   stylelint-scss: ^7.2.0
   tailwind-merge: ^3.6.0
   tailwindcss: ^4.3.3
-  tdesign-vue-next: ^1.20.3
   theme-colors: ^0.1.0
   tippy.js: ^6.3.7
   tsdown: ^0.22.14

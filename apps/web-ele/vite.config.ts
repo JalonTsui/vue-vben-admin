@@ -15,6 +15,11 @@ export default defineConfig(async () => {
       ],
       server: {
         proxy: {
+          // region 服务（FastAPI），路径无需 rewrite，后端即以 /api/v1 开头
+          '/api/v1/regions': {
+            changeOrigin: true,
+            target: 'http://localhost:8000',
+          },
           '/api': {
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
